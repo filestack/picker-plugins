@@ -1,0 +1,29 @@
+{
+  "name": "google-file-picker",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "pcholuj <pcholuj@gmail.com>",
+  "homepage": "https://github.com/filestack/picker-plugins/tree/master/packages/google-file-picker#readme",
+  "license": "ISC",
+  "main": "lib/google-file-picker.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/filestack/picker-plugins.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/filestack/picker-plugins/issues"
+  },
+  "dependencies": {
+    "webpack": "^4.44.1"
+  }
+}
