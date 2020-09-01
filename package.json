@@ -18,6 +18,7 @@
   "homepage": "https://github.com/filestack/picker-plugins#readme",
   "devDependencies": {
     "aws-sdk": "^2.742.0",
+    "got": "^11.5.2",
     "gulp-clean": "^0.4.0",
     "gulp-s3-publish": "^3.0.0",
     "lerna": "^3.22.1",

@@ -2,6 +2,7 @@ const { upload } = require('gulp-s3-publish');
 const { S3 } = require('aws-sdk'); 
 
 const tools = require('./tools');
+const got = require('got');
 const gulp = require('gulp');
 const merge = require('merge-stream');
 const webpack = require('webpack-stream');
@@ -54,7 +55,7 @@ const uploadOpts = {
 
 const client = new S3();
 
-gulp.task('publish', gulp.series(['bundle', () => {
+gulp.task('publish', gulp.series(['bundle', async () => {
   const pkgList = tools.getPackages();
   const tasks = pkgList.map((pkg) => {
     const opts = Object.assign({}, uploadOpts)
@@ -65,5 +66,3 @@ gulp.task('publish', gulp.series(['bundle', () => {
 
   return merge(tasks);
 }]));
-
-

@@ -5,6 +5,7 @@
   "author": "pcholuj <pcholuj@gmail.com>",
   "homepage": "https://github.com/filestack/picker-plugins/tree/master/packages/google-file-picker#readme",
   "license": "ISC",
+  "private": "true",
   "main": "lib/google-file-picker.js",
   "directories": {
     "lib": "lib",
