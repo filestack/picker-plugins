@@ -15,8 +15,8 @@ gulp.task('cleanup:dist', () => {
   const pkgList = tools.getPackages();
 
   const tasks = pkgList.map((pkg) => {
-    return gulp.src(`${pkg.path}/${DIST_DIR}`, {read: false})
-        .pipe(clean());
+    return gulp.src(`${pkg.path}/${DIST_DIR}`, { read: false, allowEmpty: true })
+        .pipe(clean({ allowEmpty: true }));
   });
 
   return merge(tasks);

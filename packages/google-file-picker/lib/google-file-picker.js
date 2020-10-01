@@ -1,54 +1,51 @@
-export class FsGooglePicker {
+const GOOGLE_DOCS_EXPORT_MAP = {
+  'application/vnd.google-apps.document': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.google-apps.drawing': 'image/jpeg',
+  'application/vnd.google-apps.presentation': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+};
 
-  constructor({ clientId, developerKey, scope }) {
+const GOOGLE_API_URL = 'https://apis.google.com/js/api.js';
+
+export class FsGooglePicker {
+  constructor({ clientId, developerKey, scope = 'https://www.googleapis.com/auth/drive.file' }) {
     this.clientId = clientId;
     this.developerKey = developerKey;
     this.scope = scope;
+    this.loaded = false;
 
-    this.initialized = false;
-    this.isAppended = false;
+    this.loadScript();
   }
 
-  init() {
-    return this.appendApiScript();
+  loadScript() {
+    const scriptTag = document.createElement('script');
+    scriptTag.src = GOOGLE_API_URL;
+    scriptTag.onload = () => this.onScripLoaded();
+
+    document.body.appendChild(scriptTag);
+  }
+
+  onScripLoaded() {
+    gapi.load('auth2', () => {
+      gapi.load('picker', () => {
+        gapi.load('client', () => {
+          gapi.client.load('drive', 'v2', () => {
+            this.loaded = true;
+          });
+        });
+      });
+    });
   }
 
   initView(el, actions, options) {
+    this.actions = actions;
+
     const custom = this.createElement();
     el.appendChild(custom);
     return custom;
   }
 
-  appendApiScript() {
-    if (this.isAppended) {
-      return Promise.resolve();
-    }
-
-    const script = document.createElement('script');
-    script.src = `https://apis.google.com/js/api.js?onload=apiLoadedCallback`;
-    script.async = true;
-    script.defer = true;
-
-    return new Promise((resolve) => {
-      window.apiLoadedCallback = () => {
-        gapi.load('auth2', () => {
-          gapi.load('picker',() => {
-            gapi.load('client',() => {
-              this.initialized = true;
-              resolve();
-            });
-          });
-        });
-      }
-
-      this.isAppended = true;
-      document.body.appendChild(script);
-    })
-  }
-
-  unmounted() {
-
-  }
+  unmounted() {}
 
   createElement() {
     const div = document.createElement('div');
@@ -58,7 +55,7 @@ export class FsGooglePicker {
     button.classList.add('fsp-button');
     button.classList.add('fsp-button--primary');
 
-    button.innerHTML = 'Open Google Picker'
+    button.innerHTML = 'Open Google Picker';
 
     button.addEventListener('click', (e) => {
       e.preventDefault();
@@ -73,9 +70,7 @@ export class FsGooglePicker {
 
   authorize() {
     // wait until script will be loaded
-    if (!this.initialized) {
-      this.appendApiScript();
-
+    if (!this.loaded) {
       if (!this.retry) {
         this.retry = 1;
       } else {
@@ -86,66 +81,87 @@ export class FsGooglePicker {
         this.retry++;
       }
 
-      return setTimeout(() => this.authorize(), 200);
+      return setTimeout(() => this.authorize(), 100);
     }
 
     if (this.oauthToken) {
       this.createPicker();
     } else {
       gapi.auth2.authorize(
-      {
-        'client_id': this.clientId,
-        'scope': this.scope,
-        'immediate': false
-      }, (authResult) => {
-        if (authResult && !authResult.error) {
-          this.oauthToken = authResult.access_token;
-          this.createPicker();
-        } else {
-          console.warn('Cannot authorize user')
-        }
-      });
+        {
+          client_id: this.clientId,
+          scope: this.scope,
+          immediate: false,
+        },
+        (authResult) => {
+          if (authResult && !authResult.error) {
+            this.oauthToken = authResult.access_token;
+            this.createPicker();
+          }
+        },
+      );
     }
   }
 
   createPicker() {
     if (!this.picker) {
-      this.picker = new google.picker.PickerBuilder().
-        addView(google.picker.ViewId.DOCS).
-        enableFeature(google.picker.Feature.NAV_HIDDEN).
-        setOAuthToken(this.oauthToken).
-        setDeveloperKey(this.developerKey).
-        setCallback((res) => {
+      this.picker = new google.picker.PickerBuilder()
+        .addView(google.picker.ViewId.DOCS)
+        .enableFeature(google.picker.Feature.NAV_HIDDEN)
+        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+        .setOAuthToken(this.oauthToken)
+        .setDeveloperKey(this.developerKey)
+        .setCallback((res) => {
           if (res.action === 'picked') {
             const files = res.docs;
 
             files.forEach((file) => {
-              gapi.client.request({
-                  'path': '/drive/v3/files/' + file.id + '?alt=media',
-                  'method': 'GET',
-                  callback: function (res, resfile) {
-                    console.log(res, resfile, 'altmedia');
-                    // gapi.client.request({
-                    //   'path': '/drive/v2/files/' + file.id + '/export?mimeType=' + res.mimeType,
-                    //   'method': 'GET',
-                    //     callback: function (res) {
-                    //       console.log(res);
-                    //     }
-                    // });
+              let url;
+              let mimetype;
+              // export to prefered mimetype
+              if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
+                url = `https://www.googleapis.com/drive/v2/files/${file.id}/export&mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}&`;
+                mimetype = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
+              } else {
+                url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
+              }
+
+              gapi.client.drive.files.get({
+                  'fileId' : file.id
+              }).then((res) => {
+                if (!mimetype) {
+                  mimetype = res.result.mimeType;
+                }
+
+                let file = {
+                  type: mimetype,
+                  display_name: res.result.title,
+                  filename: res.result.originalFilename,
+                  thumb_exists: true,
+                  thumbnail: res.result.thumbnailLink,
+                  is_dir: false,
+                  source: 'url',
+                  link_path: url,
+                  headers: {
+                    'Authorization': `Bearer ${this.oauthToken}`,
                   }
+                };
+
+                console.log(file);
+
+                this.actions.addFile(file);
               });
             });
           }
-        }).
+        })
+        .build();
+    }
 
-        build();
-      }
+    this.picker.setVisible(true);
 
-      this.picker.setVisible(true);
-
-      setTimeout(() => {
-        document.querySelector('.picker-dialog').style['z-index'] = parseInt(window.getComputedStyle(document.querySelector('.fsp-picker'))['z-index']) + 1;
-      }, 10)
+    setTimeout(() => {
+      document.querySelector('.picker-dialog').style['z-index'] = parseInt(window.getComputedStyle(document.querySelector('.fsp-picker'))['z-index']) + 1;
+    }, 10);
 
     return this.picker;
   }
@@ -156,10 +172,11 @@ export class FsGooglePicker {
     return {
       label: 'Google Picker',
       name: 'googlepicker',
-      icon: '<svg height="36" viewBox="0 0 36 36" width="36" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><circle cx="18" cy="18" fill="#fff" r="18"/><path d="m27 20h-6.286l-5.714-10h6.286z" fill="#ffd04d"/><path d="m13 26h10.571l3.429-5h-10.857z" fill="#4688f4"/><path d="m9 20.808 3.194 5.192 5.806-9.23-3.484-5.77z" fill="#1da362"/></g></svg>',
+      icon:
+        '<svg height="36" viewBox="0 0 36 36" width="36" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><circle cx="18" cy="18" fill="#fff" r="18"/><path d="m27 20h-6.286l-5.714-10h6.286z" fill="#ffd04d"/><path d="m13 26h10.571l3.429-5h-10.857z" fill="#4688f4"/><path d="m9 20.808 3.194 5.192 5.806-9.23-3.484-5.77z" fill="#1da362"/></g></svg>',
       mounted(element, actions, options) {
-        t.initView(element, actions, options).bind(t);
-      }
-    }
+        t.initView.call(t, element, actions, options);
+      },
+    };
   }
-}
+};
