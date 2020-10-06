@@ -8,7 +8,7 @@ const GOOGLE_DOCS_EXPORT_MAP = {
 const GOOGLE_API_URL = 'https://apis.google.com/js/api.js';
 
 export class FsGooglePicker {
-  constructor({ clientId, developerKey, scope = 'https://www.googleapis.com/auth/drive.file' }) {
+  constructor({ clientId, developerKey, scope = 'https://www.googleapis.com/auth/drive.readonly' }) {
     this.clientId = clientId;
     this.developerKey = developerKey;
     this.scope = scope;
@@ -118,9 +118,11 @@ export class FsGooglePicker {
             files.forEach((file) => {
               let url;
               let mimetype;
+              let thumbnailLink;
+
               // export to prefered mimetype
               if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
-                url = `https://www.googleapis.com/drive/v2/files/${file.id}/export&mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}&`;
+                url = `https://content.googleapis.com/drive/v2/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
                 mimetype = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
               } else {
                 url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
@@ -129,16 +131,21 @@ export class FsGooglePicker {
               gapi.client.drive.files.get({
                   'fileId' : file.id
               }).then((res) => {
+                const file = res.result;
+
                 if (!mimetype) {
-                  mimetype = res.result.mimeType;
+                  mimetype = file.mimeType;
+                  thumbnailLink =  file.iconLink;
+                } else {
+                  thumbnailLink = file.thumbnailLink;
                 }
 
-                let file = {
+                let fileToUpload = {
                   type: mimetype,
-                  display_name: res.result.title,
-                  filename: res.result.originalFilename,
+                  display_name: file.title,
+                  filename: file.originalFilename,
                   thumb_exists: true,
-                  thumbnail: res.result.thumbnailLink,
+                  thumbnail: thumbnailLink,
                   is_dir: false,
                   source: 'url',
                   link_path: url,
@@ -147,9 +154,9 @@ export class FsGooglePicker {
                   }
                 };
 
-                console.log(file);
+                console.log(fileToUpload);
 
-                this.actions.addFile(file);
+                this.actions.addFile(fileToUpload);
               });
             });
           }
