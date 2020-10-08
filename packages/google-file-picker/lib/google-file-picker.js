@@ -140,23 +140,18 @@ export class FsGooglePicker {
                   thumbnailLink = file.thumbnailLink;
                 }
 
-                let fileToUpload = {
+                let customOptions = {
                   type: mimetype,
                   display_name: file.title,
-                  filename: file.originalFilename,
-                  thumb_exists: true,
+                  filename: file.originalFilename || file.title,
                   thumbnail: thumbnailLink,
-                  is_dir: false,
-                  source: 'url',
-                  link_path: url,
                   headers: {
                     'Authorization': `Bearer ${this.oauthToken}`,
-                  }
+                  },
+                  url
                 };
 
-                console.log(fileToUpload);
-
-                this.actions.addFile(fileToUpload);
+                this.actions.addCustomUrl(customOptions);
               });
             });
           }
