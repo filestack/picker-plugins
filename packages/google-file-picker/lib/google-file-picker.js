@@ -5,6 +5,13 @@ const GOOGLE_DOCS_EXPORT_MAP = {
   'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 };
 
+const MIME_TO_EXT = {
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'odt',
+  'image/jpeg': 'jpg',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'odp',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'ods'
+};
+
 const GOOGLE_API_URL = 'https://apis.google.com/js/api.js';
 
 export class FsGooglePicker {
@@ -121,13 +128,16 @@ export class FsGooglePicker {
               let url;
               let mimetype;
               let thumbnailLink;
+              let filename;
 
               // export to prefered mimetype
               if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
                 url = `https://content.googleapis.com/drive/v2/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
                 mimetype = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
+                filename = `${file.title}.${MIME_TO_EXT[mimetype]}`;
               } else {
                 url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
+                filename = file.originalFilename;
               }
 
               gapi.client.drive.files.get({
@@ -145,7 +155,7 @@ export class FsGooglePicker {
                 let customOptions = {
                   type: mimetype,
                   display_name: file.title,
-                  filename: file.originalFilename || file.title,
+                  filename,
                   thumbnail: thumbnailLink,
                   headers: {
                     'Authorization': `Bearer ${this.oauthToken}`,
