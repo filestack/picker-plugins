@@ -105,8 +105,10 @@ export class FsGooglePicker {
 
   createPicker() {
     if (!this.picker) {
+      const view = new google.picker.View(google.picker.ViewId.DOCS);
+
       this.picker = new google.picker.PickerBuilder()
-        .addView(google.picker.ViewId.DOCS)
+        .addView(view)
         .enableFeature(google.picker.Feature.NAV_HIDDEN)
         .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
         .setOAuthToken(this.oauthToken)
