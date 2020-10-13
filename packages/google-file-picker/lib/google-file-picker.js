@@ -128,16 +128,16 @@ export class FsGooglePicker {
               let url;
               let mimetype;
               let thumbnailLink;
-              let filename;
+              let filename = file.name;
+              const size = file.sizeBytes;
 
               // export to prefered mimetype
               if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
                 url = `https://content.googleapis.com/drive/v2/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
                 mimetype = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
-                filename = `${file.title}.${MIME_TO_EXT[mimetype]}`;
+                filename = `${filename}.${MIME_TO_EXT[mimetype]}`;
               } else {
                 url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
-                filename = file.originalFilename;
               }
 
               gapi.client.drive.files.get({
@@ -156,6 +156,7 @@ export class FsGooglePicker {
                   type: mimetype,
                   display_name: file.title,
                   filename,
+                  size,
                   thumbnail: thumbnailLink,
                   headers: {
                     'Authorization': `Bearer ${this.oauthToken}`,
