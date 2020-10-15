@@ -52,7 +52,11 @@ export class FsGooglePicker {
     return custom;
   }
 
-  unmounted() {}
+  unmounted(el) {
+    el.innerHTML = '';
+    this.picker = null;
+    this.oauthToken = null;
+  }
 
   createElement() {
     const div = document.createElement('div');
@@ -121,53 +125,11 @@ export class FsGooglePicker {
         .setOAuthToken(this.oauthToken)
         .setDeveloperKey(this.developerKey)
         .setCallback((res) => {
-          if (res.action === 'picked') {
-            const files = res.docs;
-
-            files.forEach((file) => {
-              let url;
-              let mimetype;
-              let thumbnailLink;
-              let filename = file.name;
-              const size = file.sizeBytes;
-
-              // export to prefered mimetype
-              if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
-                url = `https://content.googleapis.com/drive/v2/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
-                mimetype = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
-                filename = `${filename}.${MIME_TO_EXT[mimetype]}`;
-              } else {
-                url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
-              }
-
-              gapi.client.drive.files.get({
-                  'fileId' : file.id
-              }).then((res) => {
-                const file = res.result;
-
-                if (!mimetype) {
-                  mimetype = file.mimeType;
-                  thumbnailLink =  file.iconLink;
-                } else {
-                  thumbnailLink = file.thumbnailLink;
-                }
-
-                let customOptions = {
-                  type: mimetype,
-                  display_name: file.title,
-                  filename,
-                  size,
-                  thumbnail: thumbnailLink,
-                  headers: {
-                    'Authorization': `Bearer ${this.oauthToken}`,
-                  },
-                  url
-                };
-
-                this.actions.addCustomUrl(customOptions);
-              });
-            });
+          if (res.action !== 'picked') {
+            return;
           }
+
+          this.pickerCallback(res.docs);
         })
         .build();
     }
@@ -179,6 +141,51 @@ export class FsGooglePicker {
     }, 10);
 
     return this.picker;
+  }
+
+  pickerCallback(files) {
+    files.forEach((file) => {
+      let url;
+      let type;
+      let thumbnail;
+      let filename = file.name;
+      const size = file.sizeBytes;
+
+      // export to prefered mimetype
+      if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
+        url = `https://content.googleapis.com/drive/v2/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
+        type = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
+        filename = `${filename}.${MIME_TO_EXT[type]}`;
+      } else {
+        url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
+      }
+
+      gapi.client.drive.files.get({
+          'fileId' : file.id
+      }).then((res) => {
+        const fileData = res.result;
+        if (type) {
+          thumbnail =  fileData.iconLink;
+        } else {
+          type = fileData.mimeType;
+          thumbnail = fileData.thumbnailLink || fileData.iconLink;
+        }
+
+        let customOptions = {
+          display_name: fileData.title,
+          headers: {
+            'Authorization': `Bearer ${this.oauthToken}`,
+          },
+          type,
+          filename,
+          size,
+          thumbnail,
+          url
+        };
+
+        this.actions.addCustomUrl(customOptions);
+      });
+    });
   }
 
   toSource() {
