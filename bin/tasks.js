@@ -2,7 +2,6 @@ const { upload } = require('gulp-s3-publish');
 const { S3 } = require('aws-sdk'); 
 
 const tools = require('./tools');
-const got = require('got');
 const gulp = require('gulp');
 const merge = require('merge-stream');
 const webpack = require('webpack-stream');

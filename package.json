@@ -23,10 +23,11 @@
     "gulp-s3-publish": "^3.0.0",
     "lerna": "^3.22.1",
     "merge-stream": "^2.0.0",
-    "webpack-stream": "^6.0.0"
-  },
-  "dependencies": {
+    "webpack-assets-manifest": "^3.1.1",
+    "webpack-stream": "^6.0.0",
     "glob": "^7.1.6",
     "gulp": "^4.0.2"
+  },
+  "dependencies": {
   }
 }
