@@ -144,6 +144,8 @@ export class FsGooglePicker {
   }
 
   pickerCallback(files) {
+    const todos = [];
+
     files.forEach((file) => {
       let url;
       let type;
@@ -159,32 +161,35 @@ export class FsGooglePicker {
       } else {
         url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
       }
-
-      gapi.client.drive.files.get({
+      
+      todos.push(gapi.client.drive.files.get({
           'fileId' : file.id
-      }).then((res) => {
-        const fileData = res.result;
-        if (type) {
-          thumbnail =  fileData.iconLink;
-        } else {
-          type = fileData.mimeType;
-          thumbnail = fileData.thumbnailLink || fileData.iconLink;
-        }
+        }).then((res) => {
+          const fileData = res.result;
+          if (type) {
+            thumbnail =  fileData.iconLink;
+          } else {
+            type = fileData.mimeType;
+            thumbnail = fileData.thumbnailLink || fileData.iconLink;
+          }
 
-        let customOptions = {
-          display_name: fileData.title,
-          headers: {
-            'Authorization': `Bearer ${this.oauthToken}`,
-          },
-          type,
-          filename,
-          size,
-          thumbnail,
-          url
-        };
+          let customOptions = {
+            display_name: fileData.title,
+            headers: {
+              'Authorization': `Bearer ${this.oauthToken}`,
+            },
+            type,
+            filename,
+            size,
+            thumbnail,
+            url
+          };
 
-        this.actions.addCustomUrl(customOptions);
-      });
+          return this.actions.addCustomUrl(customOptions);
+        })
+      );
+      
+      Promise.all(todos).then(() => this.actions.showSummaryView());
     });
   }
 
