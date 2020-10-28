@@ -155,8 +155,9 @@ export class FsGooglePicker {
 
       // export to prefered mimetype
       if (file.mimeType && GOOGLE_DOCS_EXPORT_MAP[file.mimeType] !== undefined) {
-        url = `https://content.googleapis.com/drive/v2/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
+        url = `https://www.googleapis.com/drive/v3/files/${file.id}/export?mimeType=${encodeURIComponent(GOOGLE_DOCS_EXPORT_MAP[file.mimeType])}`;
         type = GOOGLE_DOCS_EXPORT_MAP[file.mimeType];
+
         filename = `${filename}.${MIME_TO_EXT[type]}`;
       } else {
         url = `https://www.googleapis.com/drive/v2/files/${file.id}?alt=media`;
