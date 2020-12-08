@@ -49,7 +49,7 @@ const uploadOpts = {
   putObjectParams: {
     ACL: 'public-read'
   },
-  dryRun: true,
+  // dryRun: true,
 };
 
 const client = new S3();
