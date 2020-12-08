@@ -7,8 +7,10 @@ const merge = require('merge-stream');
 const webpack = require('webpack-stream');
 const fs = require('fs');
 const clean = require('gulp-clean');
+const gitBranch = require('git-branch');
 
 const DIST_DIR = 'dist';
+const currentBranch = gitBranch.sync();
 
 gulp.task('cleanup:dist', () => {
   const pkgList = tools.getPackages();
@@ -49,19 +51,43 @@ const uploadOpts = {
   putObjectParams: {
     ACL: 'public-read'
   },
-  // dryRun: true,
+  dryRun: ['develop', 'master'].indexOf(currentBranch) > -1 ? false : true,
 };
 
 const client = new S3();
 
+const uploadVersion = (name, version) => {
+  return upload(client, {
+    ...Object.assign({}, uploadOpts), 
+    uploadPath: `${uploadOpts.uploadPath}/${name}/${version}`,
+  }).on('error', (e) => {
+    console.log(e);
+    process.exit(1);
+  });
+}
+
 gulp.task('publish', gulp.series(['bundle', async () => {
   const pkgList = tools.getPackages();
-  const tasks = pkgList.map((pkg) => {
-    const opts = Object.assign({}, uploadOpts)
-    opts.uploadPath = `${opts.uploadPath}/${pkg.name}`; 
+  console.log('Packages to publish:');
 
-    return gulp.src(`${pkg.path}/${DIST_DIR}/**/*`).pipe(upload(client, opts));
+  const toDo = [];
+
+  pkgList.forEach((pkg) => {
+    const inputDir = `${pkg.path}/${DIST_DIR}/${pkg.version}/*`;
+
+    if (currentBranch === 'master') {
+      // upload ie: 1.x.x
+      toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, `${pkg.majorVersion}.x.x`)));
+
+      // upload full version ie: 1.2.3
+      toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, pkg.version)));
+    } else {
+      // upload branch
+      toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, currentBranch)));
+    }
+
+    
   });
 
-  return merge(tasks);
-}]));
+  return merge(toDo);
+}]))

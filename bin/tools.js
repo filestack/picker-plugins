@@ -11,8 +11,11 @@ const getPackages = () => {
 
     const dirName = path.dirname(pkg);
     const name = path.basename(dirName);
+    const manifest = require(path.join(dirName, 'package.json'))
 
     toReturn.push({
+      version: manifest.version,
+      majorVersion: manifest.version.split('.')[0],
       name: name,
       path: dirName,
     });
