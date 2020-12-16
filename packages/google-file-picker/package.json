@@ -1,6 +1,6 @@
 {
   "name": "@filestack/google-file-picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Add Google Filepicker Plugin to Filestack Picker",
   "author": "pcholuj <piotr.choluj@filestack.com>",
   "homepage": "https://github.com/filestack/picker-plugins/tree/master/packages/google-file-picker#readme",
