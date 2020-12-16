@@ -19,6 +19,7 @@
   "devDependencies": {
     "aws-sdk": "^2.742.0",
     "git-branch": "^2.0.1",
+    "git-rev-sync": "^3.0.1",
     "glob": "^7.1.6",
     "got": "^11.5.2",
     "gulp": "^4.0.2",

@@ -7,10 +7,23 @@ const merge = require('merge-stream');
 const webpack = require('webpack-stream');
 const fs = require('fs');
 const clean = require('gulp-clean');
-const gitBranch = require('git-branch');
+const git = require('git-rev-sync');
+
 
 const DIST_DIR = 'dist';
-const currentBranch = gitBranch.sync();
+
+// HELPERS
+let currentTag;
+const currentBranch = git.branch();
+
+try {
+  currentTag = git.tag();
+} catch(e) {
+  console.log('Current Git Tag not found. Beta will be released');
+}
+
+console.info('Current GIT Branch is ', currentBranch);
+console.info(`Current GIT Tag is`, currentTag);
 
 gulp.task('cleanup:dist', () => {
   const pkgList = tools.getPackages();
@@ -75,7 +88,7 @@ gulp.task('publish', gulp.series(['bundle', async () => {
   pkgList.forEach((pkg) => {
     const inputDir = `${pkg.path}/${DIST_DIR}/${pkg.version}/*`;
 
-    if (currentBranch === 'master') {
+    if (currentTag) {
       // upload ie: 1.x.x
       toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, `${pkg.majorVersion}.x.x`)));
 
@@ -83,7 +96,7 @@ gulp.task('publish', gulp.series(['bundle', async () => {
       toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, pkg.version)));
     } else {
       // upload branch
-      toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, currentBranch)));
+      toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, 'beta')));
     }
 
     

@@ -1,7 +1,10 @@
 name: Picker Plugins
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ develop ]
+  create:
+    tags:
+      - v*
 jobs:
   build:
     runs-on: ubuntu-latest
