@@ -1,0 +1,10 @@
+{
+  "main.js": {
+    "src": "google-file-picker.js",
+    "integrity": "sha256-9lxfBRNWcshv/+87dm9qE926ahOPjS61T/7e+UGQ+gc= sha384-Rpa/bcokIp8PFAHC7oNZam1C9yP1FsKNxRNFCHKyLqlfkYQF3a/eaXRp2omPCI70 sha512-9eLNIexCIDZX/wcyLzaI/HJWJ+PKtAo7cRFst1IdrkRzXZuSH8U2rVSkHPE1ASsshcPfwbnV+Z5J8nTD5YrVTQ=="
+  },
+  "main.js.map": {
+    "src": "google-file-picker.js.map",
+    "integrity": "sha256-cPiEA7xV+EqWwgSoiwWFrB9AowpJKhwJjdo8e86O2GU= sha384-TUQXq8tvyZz90jOeqJ1FFh+bE45MfCJ2pOMrBwlqt2DTNbf6ONvP0UkOzgUfOT4W sha512-mWrcpa8BiXV5ocXy8tL69px8e4cDVB/rMzyNg8K8fF3jsxED4qImzaARjveOldlBx82nVWna9SSnfhmpE24J4g=="
+  }
+}

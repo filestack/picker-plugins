@@ -1,0 +1,16 @@
+
+node_modules
+**/node_modules
+
+**/dist
+**/coverage
+
+*.log
+.env
+.nyc_output
+.stats.json
+.DS_Store
+
+# VS Code
+.vscode
+!.vscode/tasks.js

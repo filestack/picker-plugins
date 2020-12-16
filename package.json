@@ -1,0 +1,36 @@
+{
+  "name": "picker-plugins",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/filestack/picker-plugins.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/filestack/picker-plugins/issues"
+  },
+  "homepage": "https://github.com/filestack/picker-plugins#readme",
+  "devDependencies": {
+    "aws-sdk": "^2.742.0",
+    "git-branch": "^2.0.1",
+    "git-rev-sync": "^3.0.1",
+    "glob": "^7.1.6",
+    "got": "^11.5.2",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-s3-publish": "^3.0.0",
+    "gulp-s3-upload": "^1.7.3",
+    "lerna": "^3.22.1",
+    "merge-stream": "^2.0.0",
+    "webpack-assets-manifest": "^3.1.1",
+    "webpack-stream": "^6.0.0"
+  },
+  "dependencies": {}
+}
