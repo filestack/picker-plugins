@@ -9,7 +9,6 @@ const fs = require('fs');
 const clean = require('gulp-clean');
 const git = require('git-rev-sync');
 
-
 const DIST_DIR = 'dist';
 
 // HELPERS
@@ -64,7 +63,7 @@ const uploadOpts = {
   putObjectParams: {
     ACL: 'public-read'
   },
-  dryRun: ['develop', 'master'].indexOf(currentBranch) > -1 ? false : true,
+  dryRun: false,
 };
 
 const client = new S3();
@@ -88,7 +87,7 @@ gulp.task('publish', gulp.series(['bundle', async () => {
   pkgList.forEach((pkg) => {
     const inputDir = `${pkg.path}/${DIST_DIR}/${pkg.version}/*`;
 
-    if (currentTag) {
+    if (currentTag && currentBranch === 'master') {
       // upload ie: 1.x.x
       toDo.push(gulp.src(inputDir).pipe(uploadVersion(pkg.name, `${pkg.majorVersion}.x.x`)));
 

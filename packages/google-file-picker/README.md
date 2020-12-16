@@ -4,7 +4,7 @@
 
 - clientId - The Client ID obtained from the Google API Console
 - developerKey - The Browser API key obtained from the Google API 
-- scope - Scope to use to access user's Drive items - (default 'https://www.googleapis.com/auth/drive.file')
+- scope - Scope to use to access user's Drive items - (default 'https://www.googleapis.com/auth/drive.file.readonly')
 
 
 
@@ -20,7 +20,7 @@ import { FsGooglePicker } from '@filestack/google-file-picker';
 ```js 
   const googlePickerOption = {
     clientId: 'YOUR_CLIENT_ID',
-    scope: 'https://www.googleapis.com/auth/drive', // default
+    scope: 'https://www.googleapis.com/auth/drive.readonly', // default
     developerKey: 'YOUR_DEVELOPER_KEY',
   };
 
