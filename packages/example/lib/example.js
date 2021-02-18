@@ -48,7 +48,7 @@ export class FsExample {
 
           const element = e.currentTarget;
           const idx = parseInt(element.dataset.idx);
-          const file = sourceUrlsArray[idx];
+          const file = SOURCE_URL[idx];
 
           if (toUpload[idx]) {
             element.classList.remove('file-selected');
