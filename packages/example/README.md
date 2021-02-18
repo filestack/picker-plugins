@@ -1,12 +1,4 @@
-# Picker Plugin: Google File Picker
-
-## Requirements:
-
-- clientId - The Client ID obtained from the Google API Console
-- developerKey - The Browser API key obtained from the Google API 
-- scope - Scope to use to access user's Drive items - (default 'https://www.googleapis.com/auth/drive.file.readonly')
-
-
+# Picker Plugin: Example
 
 ## Usage: 
 

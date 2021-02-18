@@ -2,7 +2,7 @@
   "name": "@filestack/example",
   "version": "1.0.1",
   "description": "Add Example Filepicker Plugin to Filestack Picker",
-  "author": "pcholuj <piotr.choluj@filestack.com>",
+  "author": "konradkrk <konrad.marek@filestack.com>",
   "homepage": "https://github.com/filestack/picker-plugins/tree/master/packages/example#readme",
   "license": "ISC",
   "private": "true",
