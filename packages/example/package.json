@@ -1,0 +1,29 @@
+{
+  "name": "@filestack/example",
+  "version": "1.0.1",
+  "description": "Add Example Filepicker Plugin to Filestack Picker",
+  "author": "konradkrk <konrad.marek@filestack.com>",
+  "homepage": "https://github.com/filestack/picker-plugins/tree/master/packages/example#readme",
+  "license": "ISC",
+  "private": "true",
+  "main": "lib/example.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/filestack/picker-plugins.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/filestack/picker-plugins/issues"
+  },
+  "dependencies": {
+    "webpack": "^4.44.1"
+  }
+}

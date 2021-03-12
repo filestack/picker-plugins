@@ -20,6 +20,7 @@
 ## What's in the box?
 
 - Google File Picker Plugin [https://github.com/filestack/picker-plugins/tree/develop/packages/google-file-picker]
+- Example Picker Plugin [https://github.com/filestack/picker-plugins/tree/develop/packages/example]
 
 
 #### SRI
