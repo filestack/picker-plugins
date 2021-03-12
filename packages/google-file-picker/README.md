@@ -24,7 +24,7 @@ import { FsGooglePicker } from '@filestack/google-file-picker';
     developerKey: 'YOUR_DEVELOPER_KEY',
   };
 
-  const customSource = new plugins.FsGooglePicker(googlePickerOption).toSource();
+  const googlePicker = new plugins.FsGooglePicker(googlePickerOption).toSource();
 ```
 
 ### Usage in picker: 
@@ -41,7 +41,7 @@ import { FsGooglePicker } from '@filestack/google-file-picker';
       'imagesearch',
       'facebook',
       'instagram',
-      customSource, // custom source class
+      googlePicker, // googlePickerSource
     ],
     onOpen: () => console.log('opened!'),
     onUploadDone: (res) => console.log(res),
